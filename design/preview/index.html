@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubZero UI/UX Design System - Figma Canvas Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0A192F;
+      --surface: #112240;
+      --surface-variant: #233554;
+      --primary: #0077B6;
+      --secondary: #48CAE4;
+      --text-primary: #F8F9FA;
+      --text-secondary: #8892B0;
+      
+      --crit-bg: #311013;
+      --crit-text: #FF5252;
+      --warn-bg: #2E1E0F;
+      --warn-text: #FFA726;
+      --safe-bg: #0C2B35;
+      --safe-text: #00B4D8;
+      --gold: #FFD166;
+      --gold-bg: #332A15;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background-color: #050b14;
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    header p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .canvas-container {
+      display: flex;
+      gap: 40px;
+      overflow-x: auto;
+      padding: 20px 40px;
+      max-width: 100vw;
+    }
+
+    /* Mobile Frame 390x844 */
+    .mobile-frame {
+      width: 390px;
+      height: 844px;
+      min-width: 390px;
+      background: var(--bg-dark);
+      border-radius: 44px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--surface-variant);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .frame-title {
+      position: absolute;
+      top: -30px;
+      left: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--secondary);
+      letter-spacing: 0.5px;
+    }
+
+    .frame-wrapper {
+      position: relative;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 44px;
+      padding: 12px 24px 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      z-index: 10;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    /* PANTALLA 1 */
+    .p1-header {
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFFFFF, var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header-badges {
+      display: flex;
+      gap: 8px;
+    }
+    .badge-quota {
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .badge-pro {
+      background: var(--gold-bg);
+      border: 1px solid var(--gold);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .chips-carousel {
+      display: flex;
+      gap: 8px;
+      padding: 12px 24px;
+      overflow-x: auto;
+    }
+    .chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+    .chip.inactive {
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      color: var(--text-secondary);
+    }
+
+    .inventory-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 8px 24px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .item-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .item-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .item-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .item-loc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .item-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .urgency-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .urgency-crit { background: var(--crit-bg); color: var(--crit-text); }
+    .urgency-warn { background: var(--warn-bg); color: var(--warn-text); }
+    .urgency-safe { background: var(--safe-bg); color: var(--safe-text); }
+
+    .fab {
+      position: absolute;
+      bottom: 84px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: var(--secondary);
+      color: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(72, 202, 228, 0.4);
+      cursor: pointer;
+    }
+
+    .ad-banner {
+      height: 50px;
+      margin: 12px 24px 20px 24px;
+      background: var(--surface);
+      border: 1px dashed var(--surface-variant);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* PANTALLA 2 (Bottom Sheet) */
+    .sheet-backdrop {
+      background: rgba(5, 13, 24, 0.85);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .bottom-sheet {
+      background: var(--bg-dark);
+      border-radius: 28px 28px 0 0;
+      border-top: 1px solid var(--surface-variant);
+      padding: 16px 24px 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .drag-handle {
+      width: 40px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--surface-variant);
+      margin: 0 auto;
+    }
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sheet-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .input-field {
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+    .input-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cat-selector {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+    }
+    .cat-card {
+      width: 58px;
+      height: 64px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .cat-card.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .cat-card.inactive {
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      color: var(--text-secondary);
+    }
+    .auto-date-card {
+      background: var(--safe-bg);
+      border: 1px solid var(--safe-text);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .switch-tile {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .toggle {
+      width: 44px;
+      height: 26px;
+      border-radius: 13px;
+      background: var(--secondary);
+      position: relative;
+    }
+    .toggle-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      background: var(--bg-dark);
+      position: absolute;
+      top: 3px;
+      right: 3px;
+    }
+    .primary-btn {
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(0, 119, 182, 0.35);
+      cursor: pointer;
+    }
+
+    /* PANTALLA 3 (Paywall) */
+    .p3-content {
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+    }
+    .hero-halo {
+      width: 96px;
+      height: 96px;
+      border-radius: 48px;
+      background: var(--safe-bg);
+      border: 2px solid var(--secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      box-shadow: 0 0 35px rgba(72, 202, 228, 0.25);
+    }
+    .paywall-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: -6px;
+    }
+    .paywall-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: -8px;
+    }
+    .benefits-card {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      border-radius: 18px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: left;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .check-icon {
+      color: var(--secondary);
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .offer-card {
+      width: 100%;
+      background: var(--surface);
+      border: 2px solid var(--secondary);
+      border-radius: 18px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .offer-tag {
+      background: var(--gold-bg);
+      color: var(--gold);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      width: fit-content;
+      margin-bottom: 4px;
+    }
+    .offer-title {
+      font-size: 15px;
+      font-weight: 600;
+      text-align: left;
+    }
+    .offer-price {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--secondary);
+    }
+    .restore-link {
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .legal-notice {
+      color: #5A6785;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>❄️ SubZero Mobile Design System</h1>
+    <p>Material 3 & iOS HIG Mobile UI Kit (Frames 390x844 px • Auto-Layout • 40px Spacing)</p>
+  </header>
+
+  <div class="canvas-container">
+    
+    <!-- PANTALLA 1: Home Dashboard -->
+    <div class="frame-wrapper">
+      <div class="frame-title">SCREEN 01 • home_inventory_screen</div>
+      <div class="mobile-frame">
+        <div class="status-bar">
+          <span>09:41</span>
+          <div class="status-icons"><span>􀋑</span><span>􀙇</span><span>􀛨</span></div>
+        </div>
+
+        <div class="p1-header">
+          <div class="brand-group">
+            <span style="font-size: 22px;">❄️</span>
+            <span class="brand-title">SubZero</span>
+          </div>
+          <div class="header-badges">
+            <div class="badge-quota">14 / 25 usados</div>
+            <div class="badge-pro">PRO ⭐</div>
+          </div>
+        </div>
+
+        <div class="chips-carousel">
+          <div class="chip active">Todos (14)</div>
+          <div class="chip inactive">Críticos (2)</div>
+          <div class="chip inactive">Por vencer (4)</div>
+          <div class="chip inactive">Seguros (8)</div>
+        </div>
+
+        <div class="inventory-list">
+          <!-- Item 1 -->
+          <div class="item-card">
+            <div class="item-icon">🥩</div>
+            <div class="item-info">
+              <div class="item-name">Bifes de lomo</div>
+              <div class="item-loc">Cajón superior • 800g</div>
+            </div>
+            <div class="item-meta">
+              <div class="urgency-badge urgency-crit">Vence en 4 días</div>
+              <span style="font-size: 11px; color: var(--secondary);">🔔</span>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="item-card">
+            <div class="item-icon">🍗</div>
+            <div class="item-info">
+              <div class="item-name">Pechugas de pollo</div>
+              <div class="item-loc">Bolsa Ziploc • 1.2kg</div>
+            </div>
+            <div class="item-meta">
+              <div class="urgency-badge urgency-warn">Vence en 19 días</div>
+              <span style="font-size: 11px; color: var(--secondary);">🔔</span>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="item-card">
+            <div class="item-icon">🥬</div>
+            <div class="item-info">
+              <div class="item-name">Espinaca congelada</div>
+              <div class="item-loc">Estante 2 • Tupper</div>
+            </div>
+            <div class="item-meta">
+              <div class="urgency-badge urgency-safe">Vence en 7 meses</div>
+              <span style="font-size: 11px; color: var(--secondary);">🔔</span>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="item-card">
+            <div class="item-icon">🍲</div>
+            <div class="item-info">
+              <div class="item-name">Guiso de lentejas</div>
+              <div class="item-loc">Cajón medio • 2 porc.</div>
+            </div>
+            <div class="item-meta">
+              <div class="urgency-badge urgency-safe">Vence en 2 meses</div>
+              <span style="font-size: 11px; color: var(--secondary);">🔔</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fab">+</div>
+        <div class="ad-banner">📢 Ad Placeholder (ironSource LevelPlay 320x50)</div>
+      </div>
+    </div>
+
+    <!-- PANTALLA 2: Quick-Add Modal -->
+    <div class="frame-wrapper">
+      <div class="frame-title">SCREEN 02 • add_item_bottom_sheet</div>
+      <div class="mobile-frame">
+        <div class="status-bar">
+          <span>09:41</span>
+          <div class="status-icons"><span>􀋑</span><span>􀙇</span><span>􀛨</span></div>
+        </div>
+        
+        <div class="sheet-backdrop">
+          <div class="bottom-sheet">
+            <div class="drag-handle"></div>
+            <div class="sheet-header">
+              <div class="sheet-title">Congelar Alimento</div>
+              <span style="color: var(--text-secondary); cursor: pointer;">✕</span>
+            </div>
+
+            <div class="input-field">Salmón rosado congelado</div>
+
+            <div class="input-label">Categoría de alimento</div>
+            <div class="cat-selector">
+              <div class="cat-card inactive"><span>🥩</span><span style="font-size: 10px;">Carnes</span></div>
+              <div class="cat-card active"><span>🐟</span><span style="font-size: 10px;">Pescados</span></div>
+              <div class="cat-card inactive"><span>🍗</span><span style="font-size: 10px;">Aves</span></div>
+              <div class="cat-card inactive"><span>🥦</span><span style="font-size: 10px;">Verduras</span></div>
+              <div class="cat-card inactive"><span>🍲</span><span style="font-size: 10px;">Cocidos</span></div>
+            </div>
+
+            <div class="auto-date-card">
+              <div>
+                <div style="font-size: 11px; color: var(--safe-text); font-weight: 600;">⚡ Caducidad sugerida automáticamente</div>
+                <div style="font-size: 14px; font-weight: 700; color: #FFF; margin-top: 2px;">+8 meses (15 Oct 2026)</div>
+              </div>
+              <span style="color: var(--secondary); font-size: 12px; font-weight: 600; cursor: pointer;">Cambiar</span>
+            </div>
+
+            <div class="switch-tile">
+              <div>
+                <div style="font-size: 13px; font-weight: 600;">Recordarme antes de vencer</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">Alerta diaria a las 09:00 AM</div>
+              </div>
+              <div class="toggle"><div class="toggle-thumb"></div></div>
+            </div>
+
+            <div class="input-field" style="color: var(--text-secondary); font-size: 13px;">Ubicación: Tupper azul, Cajón 2</div>
+
+            <div class="primary-btn">Guardar en el congelador</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLA 3: Paywall SubZero Pro -->
+    <div class="frame-wrapper">
+      <div class="frame-title">SCREEN 03 • paywall_screen</div>
+      <div class="mobile-frame">
+        <div class="status-bar">
+          <span>09:41</span>
+          <div class="status-icons"><span>􀋑</span><span>􀙇</span><span>􀛨</span></div>
+        </div>
+
+        <div style="padding: 12px 24px 0 24px; text-align: left;">
+          <span style="background: var(--surface); border-radius: 50%; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary);">✕</span>
+        </div>
+
+        <div class="p3-content">
+          <div class="hero-halo">🏔️</div>
+          <div class="paywall-title">Desbloquea SubZero Pro</div>
+          <div class="paywall-subtitle">Espacio ilimitado y tranquilidad total en tu cocina</div>
+
+          <div class="benefits-card">
+            <div class="benefit-item">
+              <span class="check-icon">✓</span>
+              <span>Alimentos ilimitados (elimina el tope de 25)</span>
+            </div>
+            <div class="benefit-item">
+              <span class="check-icon">✓</span>
+              <span>100% libre de anuncios para siempre</span>
+            </div>
+            <div class="benefit-item">
+              <span class="check-icon">✓</span>
+              <span>Apoyo directo a un desarrollador independiente</span>
+            </div>
+          </div>
+
+          <div class="offer-card">
+            <div>
+              <div class="offer-tag">UN SOLO PAGO</div>
+              <div class="offer-title">Acceso Vitalicio Único</div>
+            </div>
+            <div class="offer-price">$3.99 USD</div>
+          </div>
+
+          <div class="primary-btn" style="width: 100%;">Continuar a SubZero Pro</div>
+          <div class="restore-link">Restaurar compras</div>
+          <div class="legal-notice">Sin suscripciones recurrentes • Pago seguro con Google Play</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
+

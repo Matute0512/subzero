@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidad - SubZero</title>
+  <style>
+    :root {
+      --bg-dark: #0A192F;
+      --surface: #112240;
+      --surface-variant: #233554;
+      --primary: #0A84FF;
+      --secondary: #64FFDA;
+      --text-primary: #FFFFFF;
+      --text-secondary: #8892B0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 24px 16px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--surface-variant);
+    }
+    .brand {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--secondary);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 24px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--secondary);
+      margin-top: 12px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-variant);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 18px;
+      color: var(--secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+    a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--surface-variant);
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">❄️ SubZero</div>
+      <h1>Política de Privacidad</h1>
+      <p class="subtitle">Gestión visual e inteligente de alimentos congelados</p>
+      <div class="badge">100% Offline-First • Privacidad Local Garantizada</div>
+    </header>
+
+    <div class="card">
+      <h2>1. Compromiso de Privacidad y Arquitectura Offline-First</h2>
+      <p>SubZero (<code>dev.matute.subzero</code>) ha sido desarrollada bajo una filosofía estricta de protección de datos: <strong>tus datos te pertenecen y nunca salen de tu dispositivo</strong>.</p>
+      <p>No requerimos registro de cuenta de usuario, no solicitamos nombre real, teléfono ni correo electrónico para utilizar la aplicación. Toda la información de tus alimentos congelados (nombre, categoría, cantidad, fecha de ingreso, fecha de caducidad y notas de ubicación) se almacena únicamente de forma local en la memoria de tu dispositivo utilizando bases de datos cifradas.</p>
+      <p>SubZero no posee servidores propios en la nube ni recopila tus alimentos o notas en ninguna base de datos remota.</p>
+    </div>
+
+    <div class="card">
+      <h2>2. Publicidad con Google AdMob</h2>
+      <p>Para mantener la aplicación gratuita y accesible, la versión estándar de SubZero integra el SDK oficial de <strong>Google AdMob</strong> (Google LLC) para mostrar anuncios patrocinados.</p>
+      <p>Google AdMob puede recopilar y procesar cierta información del dispositivo con fines publicitarios, de diagnóstico y prevención del fraude, incluyendo:</p>
+      <p>• Identificador de publicidad de Android (Google Advertising ID - AAID).<br>
+         • Dirección IP aproximada.<br>
+         • Diagnóstico de rendimiento e interacciones del usuario con los anuncios.</p>
+      <p>Para más detalles sobre el tratamiento de datos de Google, puedes consultar su política oficial en: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">https://policies.google.com/privacy</a>.</p>
+      <p><strong>Desactivación completa de anuncios:</strong> Los usuarios que deseen una experiencia sin publicidad pueden desbloquear <strong>SubZero Pro</strong> mediante un pago único, tras el cual el servicio de anuncios se desactiva permanentemente.</p>
+    </div>
+
+    <div class="card">
+      <h2>3. Facturación y Compras Integradas (Google Play Billing)</h2>
+      <p>El desbloqueo de "SubZero Pro" se procesa de forma segura mediante la pasarela de pagos oficial de <strong>Google Play In-App Billing</strong>.</p>
+      <p>SubZero no solicita, no recibe, no procesa ni almacena números de tarjeta de crédito, cuentas bancarias ni credenciales financieras. Todas las operaciones de cobro y validación de licencias son gestionadas exclusivamente por Google LLC conforme a sus Términos de Servicio.</p>
+    </div>
+
+    <div class="card">
+      <h2>4. Notificaciones y Alarmas Locales</h2>
+      <p>SubZero incluye una función de alertas preventivas para recordarte consumir los alimentos antes de su caducidad (7 días y 1 día antes). Estas alertas se programan directamente en el sistema de alarmas nativo de tu teléfono (<code>AlarmManager</code> / <code>NotificationManager</code> de Android). No se utilizan servidores remotos de notificaciones push.</p>
+    </div>
+
+    <div class="card">
+      <h2>5. Control y Eliminación de Datos</h2>
+      <p>Usted tiene el control absoluto y permanente sobre sus datos:</p>
+      <p>• Puede editar o eliminar cualquier alimento de forma individual desde la app.<br>
+         • Puede restablecer o eliminar todos los registros eliminando el almacenamiento local de la app desde la configuración de su teléfono.<br>
+         • Si desinstala la aplicación, todos los datos almacenados localmente se eliminan de inmediato y de forma irreversible.</p>
+    </div>
+
+    <div class="card">
+      <h2>6. Menores de Edad</h2>
+      <p>SubZero está diseñada para el público general para la gestión de compras y despensa en el hogar, y no recopila deliberadamente información personal de niños menores de 13 años.</p>
+    </div>
+
+    <div class="card">
+      <h2>7. Contacto</h2>
+      <p>Si tienes preguntas o inquietudes sobre esta Política de Privacidad o sobre la aplicación SubZero, puedes comunicarte con el desarrollador a través de:</p>
+      <p>• <strong>Email de soporte:</strong> <a href="mailto:matiastorr.dev@gmail.com">matias.subzero.dev@gmail.com</a><br>
+         • <strong>Paquete de la aplicación:</strong> <code>dev.matute.subzero</code><br>
+         • <strong>Ubicación:</strong> Buenos Aires, Argentina</p>
+    </div>
+
+    <footer>
+      <p>© 2026 SubZero. Todos los derechos reservados.</p>
+      <p>Última actualización: 23 de Octubre de 2026</p>
+    </footer>
+  </div>
+</body>
+</html>

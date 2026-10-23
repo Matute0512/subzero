@@ -1,0 +1,9 @@
+# Plantilla de configuración de firma y claves privadas de Android
+# Copiar este archivo a 'key.properties' y completar con los valores reales.
+# NUNCA subas 'key.properties' ni archivos '*.jks' a Git.
+storePassword=TU_PASSWORD_DEL_KEYSTORE
+keyPassword=TU_PASSWORD_DEL_ALIAS
+keyAlias=upload
+storeFile=upload-keystore.jks
+admobAppId=ca-app-pub-3940256099942544~3347511713
+

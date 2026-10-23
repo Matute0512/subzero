@@ -1,0 +1,77 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ / Android Studio / IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# Flutter/Dart/Pub
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+**/build/
+/coverage/
+
+# Android build artifacts & Gradle caches
+.gradle/
+**/.gradle/
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/build/
+**/android/app/build/
+*.apk
+*.aab
+
+# iOS & macOS Pods / symlinks
+**/ios/Pods/
+**/ios/.symlinks/
+**/macos/Pods/
+**/macos/.symlinks/
+
+# Symbolication & Obfuscation
+app.*.symbols
+app.*.map.json
+
+# ==============================================================================
+# SEGURIDAD, SECRETOS & CLAVES PRIVADAS (NUNCA SUBIR A GIT)
+# ==============================================================================
+# Archivos de secretos de entorno y AdMob
+secrets.json
+*.env
+.env*
+!.env.example
+
+# Firmas de Android, Keystores y Propiedades de release
+**/key.properties
+**/local.properties
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+
+# Capturas de pantalla temporales y utilitarios de análisis
+screen_*.png
+screen_*.jpg
+graphify-out/

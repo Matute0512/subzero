@@ -1,0 +1,76 @@
+name: subzero
+description: "Gestor visual e inteligente de alimentos congelados y despensa."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ==========================================
+  # GESTIÓN DE ESTADO & ARQUITECTURA
+  # ==========================================
+  flutter_bloc: ^8.1.6        # O flutter_riverpod: ^2.5.1
+  get_it: ^7.7.0              # Inversión de dependencias (Service Locator)
+  equatable: ^2.0.5           # Comparación de valor en entidades y estados
+  fpdart: ^1.1.0              # Programación funcional: Either<Failure, Success>
+
+  # ==========================================
+  # PERSISTENCIA LOCAL (Offline-First)
+  # ==========================================
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0        # Motor NoSQL ultra ligero sin overhead nativo
+  # Si prefieres SQLite relacional estricto, reemplazar con drift + sqlite3_flutter_libs
+
+  # ==========================================
+  # NOTIFICACIONES LOCALES & TIEMPO
+  # ==========================================
+  flutter_local_notifications: ^17.2.1
+  timezone: ^0.9.4            # Manejo de zonas horarias para alertas programadas
+  flutter_timezone: ^5.1.1    # Zona horaria real del dispositivo (sin esto, tz.local queda en UTC)
+
+  # ==========================================
+  # MONETIZACIÓN & MEDIACIÓN
+  # ==========================================
+  google_mobile_ads: ^9.2.0    # SDK oficial de Google AdMob para Flutter
+  in_app_purchase: ^3.2.0      # Google Play Billing oficial para desbloqueo Pro
+
+  # ==========================================
+  # UTILIDADES DE UI & HARDWARE
+  # ==========================================
+  intl: ^0.19.0               # Formateo de fechas localizado
+  uuid: ^4.4.2                # Generación de IDs únicos para entidades locales
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.9
+  mocktail: ^1.0.4            # Pruebas unitarias de UseCases y Repositorios
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#0A192F" # Azul profundo SubZero
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+
+flutter_native_splash:
+  color: "#0A192F"
+  image: "assets/icons/splash_logo.png"
+  android_12:
+    color: "#0A192F"
+    icon_background_color: "#0A192F"
+    image: "assets/icons/splash_logo.png"
