@@ -84,7 +84,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 icon: Icons.mail_outline_rounded,
                 title: '7. Contacto del Desarrollador',
                 content:
-                    'Si tienes dudas, consultas o sugerencias sobre esta Política de Privacidad, puedes ponerte en contacto con el desarrollador a través de:\n\nEmail de soporte: matias.subzero.dev@gmail.com\nPaquete de la app: dev.matute.subzero\nBuenos Aires, Argentina.',
+                    'Si tienes dudas, consultas o sugerencias sobre esta Política de Privacidad, puedes ponerte en contacto con el desarrollador a través de:\n\nEmail de soporte: matiastorr.dev@gmail.com\nPaquete de la app: dev.matute.subzero\nBuenos Aires, Argentina.',
               ),
               const SizedBox(height: 24),
               Center(
