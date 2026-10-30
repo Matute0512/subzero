@@ -2,7 +2,7 @@
 
 > **Gestor visual e inteligente de alimentos congelados y despensa.**
 
-SubZero es una app Flutter para **Android (Google Play Store) e iOS** que te permite gestionar el inventario de tu congelador y despensa, monitorear la vida útil de cada alimento y planificar su consumo. Funciona bajo un paradigma **100% offline-first**: todos los datos residen localmente en el dispositivo mediante Hive, sin registro de cuentas, sin servidor obligatorio y con arranque instantáneo sin red.
+SubZero es una aplicación Flutter para **Android (Google Play Store) e iOS** que te permite gestionar el inventario de tu congelador y despensa, monitorear la vida útil de cada alimento y planificar su consumo. Funciona bajo un paradigma **100% offline-first**: todos los datos residen localmente en el dispositivo mediante Hive, sin registro de cuentas, sin servidor obligatorio y con arranque instantáneo sin red.
 
 ---
 
@@ -11,16 +11,19 @@ SubZero es una app Flutter para **Android (Google Play Store) e iOS** que te per
 - [Qué hace SubZero](#qué-hace-subzero)
 - [Funcionalidades](#funcionalidades)
 - [Arquitectura](#arquitectura)
-- [Stack tecnológico](#stack-tecnológico)
-- [Persistencia de datos](#persistencia-de-datos)
+- [Decisiones de Arquitectura (ADRs)](#decisiones-de-arquitectura-adrs)
+- [Stack Tecnológico](#stack-tecnológico)
+- [Persistencia de Datos](#persistencia-de-datos)
 - [Monetización y Anuncios](#monetización-y-anuncios)
-- [Sistema de diseño](#sistema-de-diseño)
-- [Puesta en marcha](#puesta-en-marcha)
-- [Firma de release (Android)](#firma-de-release-android)
-- [Generación de íconos y splash](#generación-de-íconos-y-splash)
-- [Testing](#testing)
-- [Análisis del proyecto (Graphify)](#análisis-del-proyecto-graphify)
-- [Estado actual del proyecto](#estado-actual-del-proyecto)
+- [Blindaje de Seguridad](#blindaje-de-seguridad)
+- [Sistema de Diseño](#sistema-de-diseño)
+- [Puesta en Marcha](#puesta-en-marcha)
+- [Compilación y Firma de Release (Android)](#compilación-y-firma-de-release-android)
+- [Generación de Íconos y Splash](#generación-de-íconos-y-splash)
+- [Testing Automatizado](#testing-automatizado)
+- [Análisis del Proyecto (Graphify)](#análisis-del-proyecto-graphify)
+- [Estado Actual del Proyecto](#estado-actual-del-proyecto)
+- [Historial de Cambios (Changelog)](#historial-de-cambios-changelog)
 
 ---
 
@@ -74,6 +77,7 @@ SubZero elimina el "inventario mental" del congelador, reemplazándolo por un pa
 - **Sin parpadeo publicitario (`isProResolved`):** `MonetizationState` distingue entre *"usuario gratuito confirmado"* y *"estado Pro cargando"*, ocultando los banners en frío hasta confirmar el estado del usuario.
 - **Restauración confiable:** `restorePurchasesAndWait()` espera la confirmación real de Google Play antes de resolver el estado, permitiendo recuperar compras tras reinstalar la app o cambiar de teléfono.
 - **Gestión de incidencias en línea:** Errores de tienda, pagos pendientes y cancelaciones se exponen en línea en [`PaywallScreen`](lib/features/monetization/presentation/screens/paywall_screen.dart) con mensajes amigables y reintentos automáticos (backoff de 3 intentos en `completePurchase`).
+- **Caché en Memoria:** `MonetizationRepositoryImpl` cachea en memoria los detalles del producto tras la primera consulta exitosa, eliminando llamadas de red redundantes.
 
 ---
 
@@ -90,7 +94,7 @@ lib/
 │   ├── errors/                        # Exception (capa data) y Failure (capa domain)
 │   ├── notifications/                 # INotificationService, LocalNotificationService y NotifiableItem
 │   ├── theme/                         # AppTheme, tokens cromáticos y elevaciones
-│   └── utils/                         # AppLogger estructurado para producción
+│   └── utils/                         # AppLogger estructurado para producción (muting en release)
 └── features/
     ├── inventory/
     │   ├── domain/                    # Entidades (FrozenItem), usecases e IInventoryQuotaPolicy
@@ -117,6 +121,18 @@ lib/
 3. **Core Puro:**
    * `core/notifications` no conoce entidades de inventario; solo el contrato `NotifiableItem`.
    * `core/ads` no conoce pantallas; encapsula la publicidad detrás de `IAdService`.
+
+---
+
+## Decisiones de Arquitectura (ADRs)
+
+El razonamiento técnico, restricciones y alternativas evaluadas se encuentran documentados formalmente en [`docs/decisions/`](docs/decisions/):
+
+- [**ADR-001: Persistencia Local 100% Offline-First con Hive**](docs/decisions/0001-offline-first-hive-persistence.md)
+- [**ADR-002: Clean Architecture + Feature-First con Puertos de Desacoplamiento**](docs/decisions/0002-clean-architecture-feature-first.md)
+- [**ADR-003: Notificaciones Locales Deterministas con Hash FNV-1a y Modo de Alarma Adaptativo**](docs/decisions/0003-notification-scheduling-and-fnv1a-ids.md)
+- [**ADR-004: Inicialización Asíncrona de Publicidad y Validación Criptográfica de Compras In-App**](docs/decisions/0004-lazy-monetization-and-iap-verification.md)
+- [**ADR-005: Blindaje de Seguridad, Mitigación de Superficie de Ataque y Ofuscación de Release**](docs/decisions/0005-security-hardening-and-binary-obfuscation.md)
 
 ---
 
@@ -171,10 +187,26 @@ abstract class IAdService {
 ### Comportamiento Híbrido Automático (Desarrollo vs Producción)
 
 * **En modo Debug (`flutter run`):** `AdMobAdService` utiliza automáticamente los Ad Unit IDs de prueba oficiales de Google. Permite realizar pruebas sin riesgo de penalizaciones por clics propios.
-* **En modo Release (`flutter build appbundle --release --dart-define-from-file=secrets.json`):** Inyecta de forma segura los bloques comerciales privados desde el archivo local `secrets.json` (ignorado por Git):
+* **En modo Release:** Inyecta de forma segura los bloques comerciales privados desde el archivo local `secrets.json` (ignorado por Git):
   * **Banner:** `ADMOB_BANNER_ID` (anuncio inferior colapsable en pantalla principal).
   * **Intersticial:** `ADMOB_INTERSTITIAL_ID` (al registrar alimentos para usuarios gratuitos).
   * **Bonificado:** `ADMOB_REWARDED_ID` (disponible para recompensas).
+
+---
+
+## Blindaje de Seguridad
+
+1. **Android Manifest:**
+   - `android:allowBackup="false"` y `android:fullBackupContent="false"`: Impiden la extracción y manipulación no autorizada de las cajas de datos locales de Hive a través de `adb backup`.
+   - `android:usesCleartextTraffic="false"`: Prohíbe cualquier tráfico HTTP en texto claro a nivel del sistema operativo.
+2. **Supresión de Logs en Producción:**
+   - En compilaciones de release (`kReleaseMode == true`), `AppLogger.debug` e `info` quedan silenciados para evitar fugas de telemetría a `logcat`.
+3. **Validación de Límites en Dominio:**
+   - Casos de uso (`AddFrozenItemUseCase` y `UpdateFrozenItemUseCase`) comprueban estrictamente longitudes de texto (`name <= 100`, `quantity <= 999999.0`, `locationNotes <= 300`) protegiendo a Hive de desbordamiento o degradación de memoria.
+4. **Validación Criptográfica de Compras:**
+   - `InAppPurchaseDataSourceImpl` rechaza eventos de compra sin datos de verificación válidos (`serverVerificationData` / `localVerificationData`) previniendo ataques de spoofing en el stream de compras.
+5. **Ofuscación de Binarios Dart:**
+   - Los scripts de compilación inyectan `--obfuscate --split-debug-info=build/app/outputs/symbols` para despojar nombres de clases y funciones en el binario final.
 
 ---
 
@@ -201,7 +233,7 @@ El diseño de SubZero se encuentra alineado con **Material 3** e **iOS Human Int
 ## Puesta en Marcha
 
 ### Requisitos previos
-* Flutter SDK (3.44.2 o superior)
+* Flutter SDK (3.24 o superior)
 * Java JDK 17
 * Android Studio con Android SDK API 34+
 * Dispositivo físico o emulador con Google Play Services
@@ -213,7 +245,7 @@ El diseño de SubZero se encuentra alineado con **Material 3** e **iOS Human Int
 flutter pub get
 
 # 2. Análisis estático de código
-flutter analyze
+dart analyze
 
 # 3. Ejecutar suite de pruebas
 flutter test
@@ -224,19 +256,22 @@ flutter run
 
 ---
 
-## Firma de Release (Android)
+## Compilación y Firma de Release (Android)
 
 La configuración de firma se gestiona mediante `android/key.properties` (excluido de git).
-Para compilar el Android App Bundle de producción firmado:
+Para compilar el Android App Bundle oficial con inyección de secretos y ofuscación:
 
 ```powershell
-flutter build appbundle --release
+# En PowerShell:
+.\scripts\build_release.ps1
+
+# En CMD / Batch:
+.\scripts\build_release.bat
 ```
 
 Salida generada:
-📁 `build/app/outputs/bundle/release/app-release.aab` (**~55.4 MB**)
-
-El archivo `android/app/proguard-rules.pro` protege de ofuscación los modelos DTO de Hive, clases de facturación y del SDK de Google Mobile Ads.
+- 📁 `build\app\outputs\bundle\release\app-release.aab` (**App Bundle listo para Google Play Console**)
+- 📁 `build\app\outputs\symbols` (**Símbolos de depuración para symbolication**)
 
 ---
 
@@ -256,23 +291,23 @@ dart run flutter_native_splash:create
 
 ---
 
-## Testing
+## Testing Automatizado
 
-La aplicación cuenta con una suite integral de **84 pruebas automatizadas** que cubren dominio, datos, BLoCs y widgets:
+La aplicación cuenta con una suite integral de **96 pruebas automatizadas** que cubren dominio, datos, BLoCs y widgets al 100%:
 
 ```powershell
 flutter test
 ```
 
 ### Estructura de pruebas
-* `test/core/notifications/`: Pruebas de IDs deterministas FNV-1a, modos de alarma y cálculo de fechas.
-* `test/features/inventory/domain/`: Validación de entidades `FrozenItem` y categorías `FoodCategory`.
-* `test/features/inventory/data/`: Pruebas de la política de cuotas `InventoryQuotaPolicyImpl`.
-* `test/features/inventory/presentation/bloc/`: Pruebas de eventos y estados de `InventoryBloc`.
-* `test/features/inventory/presentation/widgets/`: Widget tests de renderizado, interacción y badges en `InventoryItemCard`.
-* `test/features/monetization/data/`: Pruebas del datasource y repositorio de compras con mocktail.
-* `test/features/monetization/presentation/bloc/`: Pruebas de estados, errores y flujos reactivos de `MonetizationBloc`.
-* `test/features/monetization/presentation/widgets/`: Widget tests para `ProBadgeWidget`.
+* `test/core/notifications/`: Pruebas de IDs deterministas FNV-1a, modos de alarma y cálculo de fechas (10 tests).
+* `test/features/inventory/domain/`: Validación de entidades `FrozenItem`, categorías `FoodCategory` y límites de entrada en `AddFrozenItemUseCase` (25 tests).
+* `test/features/inventory/data/`: Pruebas de la política de cuotas `InventoryQuotaPolicyImpl` (6 tests).
+* `test/features/inventory/presentation/bloc/`: Pruebas de eventos, estados y resincronización de alertas en `InventoryBloc` (11 tests).
+* `test/features/inventory/presentation/widgets/`: Widget tests de renderizado, interacción y badges en `InventoryItemCard` (7 tests).
+* `test/features/monetization/data/`: Pruebas de datasource, stream de compras, anti-spoofing y caché de repositorio (21 tests).
+* `test/features/monetization/presentation/bloc/`: Pruebas de estados, errores y flujos reactivos de `MonetizationBloc` (13 tests).
+* `test/features/monetization/presentation/widgets/`: Widget tests para `ProBadgeWidget` (3 tests).
 
 ---
 
@@ -301,9 +336,36 @@ graphify path "InventoryBloc" "MonetizationBloc"
 - [x] Desacoplamiento de `core/notifications` mediante contrato `NotifiableItem`.
 - [x] Monetización Google AdMob (`google_mobile_ads: ^9.2.0`) con modo híbrido test/producción.
 - [x] Google Play Billing para desbloqueo vitalicio de SubZero Pro ($3.99 USD).
-- [x] Eliminación de parpadeo publicitario mediante `isProResolved`.
+- [x] Inicialización asíncrona no bloqueante de MobileAds y eliminación de parpadeo publicitario.
+- [x] Caché en memoria de `ProductDetails` para consultas instantáneas en el Paywall.
+- [x] Blindaje de seguridad en Android Manifest (`allowBackup="false"`, `usesCleartextTraffic="false"`).
+- [x] Supresión automática de logs diagnósticos en compilaciones de producción.
+- [x] Validación rigurosa de cotas y límites de entrada en la capa de dominio.
+- [x] Validación criptográfica de datos de compra anti-spoofing en Google Play Billing.
+- [x] Scripts de release automatizados con ofuscación (`--obfuscate`) y división de símbolos.
 - [x] Manifiesto de privacidad de Apple [`PrivacyInfo.xcprivacy`](ios/Runner/PrivacyInfo.xcprivacy) configurado para iOS y macOS.
-- [x] Íconos de aplicación generados para Android e iOS (`remove_alpha_ios: true`).
-- [x] Limpieza completa de shims y código obsoleto.
-- [x] 84 tests automáticos en verde (0 fallos).
+- [x] Documentación de decisiones arquitectónicas (`docs/decisions/` ADR-001 al ADR-005).
+- [x] Política de privacidad actualizada en Markdown y HTML para GitHub Pages (`docs/index.html`).
+- [x] 96 tests automáticos en verde (0 fallos).
 - [x] Compilación final verificada: Android App Bundle (`app-release.aab`) firmado y listo para Google Play Console.
+
+---
+
+## Historial de Cambios (Changelog)
+
+### [1.1.0] - 2026-10-29
+#### Agregado
+- Registros de Decisiones de Arquitectura (ADRs del 001 al 005) en `docs/decisions/`.
+- Protección contra falsificación de compras en `InAppPurchaseDataSourceImpl` validando `verificationData`.
+- Validación estricta de cotas en `AddFrozenItemUseCase` y `UpdateFrozenItemUseCase`.
+- Scripts de compilación de producción con ofuscación activa (`scripts/build_release.ps1` y `.bat`).
+- Política de privacidad web sincronizada para GitHub Pages en `docs/index.html`.
+
+#### Optimizado
+- Inicialización asíncrona no bloqueante de Google Mobile Ads fuera del renderizado inicial.
+- Caché en memoria para `ProductDetails` en `MonetizationRepositoryImpl`.
+- Supresión de logs diagnósticos en compilaciones de release (`AppLogger`).
+
+#### Seguridad
+- Desactivado respaldo de datos no seguro en Android (`android:allowBackup="false"`).
+- Bloqueo total de tráfico HTTP en texto claro (`android:usesCleartextTraffic="false"`).
