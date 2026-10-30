@@ -90,6 +90,15 @@ class InAppPurchaseDataSourceImpl implements IInAppPurchaseDataSource {
       if (purchaseDetails.status == PurchaseStatus.purchased ||
           purchaseDetails.status == PurchaseStatus.restored) {
         if (purchaseDetails.productID == IInAppPurchaseDataSource.proLifetimeProductId) {
+          final verification = purchaseDetails.verificationData;
+          if (verification.serverVerificationData.trim().isEmpty &&
+              verification.localVerificationData.trim().isEmpty) {
+            AppLogger.warning(
+              'Transacción ${purchaseDetails.purchaseID} sin datos de verificación criptográfica de la tienda. Omitiendo por seguridad.',
+              tag: _tag,
+            );
+            continue;
+          }
           await setProLocal(true);
         }
 
@@ -363,6 +372,3 @@ class InAppPurchaseDataSourceImpl implements IInAppPurchaseDataSource {
     _purchaseController.close();
   }
 }
-
-
-

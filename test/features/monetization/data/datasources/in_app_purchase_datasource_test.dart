@@ -15,15 +15,17 @@ PurchaseDetails _purchase({
   String productID = 'subzero_pro_lifetime',
   PurchaseStatus status = PurchaseStatus.restored,
   String? purchaseID = 'purchase-1',
+  PurchaseVerificationData? verificationData,
 }) {
   return PurchaseDetails(
     purchaseID: purchaseID,
     productID: productID,
-    verificationData: PurchaseVerificationData(
-      localVerificationData: '{}',
-      serverVerificationData: '{}',
-      source: 'test',
-    ),
+    verificationData: verificationData ??
+        PurchaseVerificationData(
+          localVerificationData: '{}',
+          serverVerificationData: '{}',
+          source: 'test',
+        ),
     transactionDate: '17000000000000',
     status: status,
   );
@@ -296,6 +298,23 @@ void main() {
     test('no persiste Pro para un producto distinto al de SubZero', () async {
       purchaseStreamController.add([
         _purchase(productID: 'otro_producto', status: PurchaseStatus.purchased),
+      ]);
+
+      await Future<void>.delayed(Duration.zero);
+
+      verifyNever(() => mockBox.put('is_pro_user', any<dynamic>()));
+    });
+
+    test('no persiste Pro si la compra tiene verificationData vacía (protección anti-spoofing)', () async {
+      purchaseStreamController.add([
+        _purchase(
+          status: PurchaseStatus.purchased,
+          verificationData: PurchaseVerificationData(
+            localVerificationData: '   ',
+            serverVerificationData: '',
+            source: 'test',
+          ),
+        ),
       ]);
 
       await Future<void>.delayed(Duration.zero);
