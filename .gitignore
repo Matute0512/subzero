@@ -75,3 +75,7 @@ secrets.json
 screen_*.png
 screen_*.jpg
 graphify-out/
+
+# Agents
+.agents/
+skills-lock.json
