@@ -27,19 +27,27 @@ class SyncInventoryAlertsUseCase {
   });
 
   /// Reprograma las alertas y devuelve cuántos alimentos quedaron cubiertos.
-  Future<Either<Failure, int>> call() async {
-    final result = await getInventoryItemsUseCase();
+  ///
+  /// Si se provee [preloadedItems], se reutiliza dicha lista en memoria,
+  /// evitando una consulta duplicada a la base de datos de Hive.
+  Future<Either<Failure, int>> call([List<FrozenItem>? preloadedItems]) async {
+    final List<FrozenItem> items;
+    if (preloadedItems != null) {
+      items = preloadedItems;
+    } else {
+      final result = await getInventoryItemsUseCase();
 
-    final Failure? failure = result.fold<Failure?>((f) => f, (_) => null);
-    if (failure != null) {
-      AppLogger.warning(
-        'No se pudieron sincronizar las alertas de vencimiento: ${failure.message}',
-        tag: _tag,
-      );
-      return Left(failure);
+      final Failure? failure = result.fold<Failure?>((f) => f, (_) => null);
+      if (failure != null) {
+        AppLogger.warning(
+          'No se pudieron sincronizar las alertas de vencimiento: ${failure.message}',
+          tag: _tag,
+        );
+        return Left(failure);
+      }
+
+      items = result.getOrElse((_) => const <FrozenItem>[]);
     }
-
-    final items = result.getOrElse((_) => const <FrozenItem>[]);
 
     // Se cancelan todas las alertas antes de reprogramar: asi se limpian las
     // alarmas huerfanas de alimentos que ya no existen (box reiniciado, copia

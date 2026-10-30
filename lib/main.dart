@@ -86,8 +86,7 @@ class SubZeroApp extends StatelessWidget {
         ),
         BlocProvider<MonetizationBloc>(
           create: (_) => sl<MonetizationBloc>()
-            ..add(const CheckProStatusEvent())
-            ..add(const LoadProductsEvent()),
+            ..add(const CheckProStatusEvent()),
         ),
       ],
       child: MaterialApp(

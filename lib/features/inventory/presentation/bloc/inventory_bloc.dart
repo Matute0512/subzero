@@ -89,21 +89,25 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       )),
     );
 
-    // Reprograma las alertas de vencimiento. Se hace despues de emitir el
-    // estado para no retrasar la carga de la lista: el sistema puede haber
-    // perdido las alarmas (reinicio, cambio de zona horaria, app hibernada).
-    await syncInventoryAlertsUseCase();
+    // Reprograma las alertas de vencimiento. Se pasa la lista en memoria
+    // para evitar una segunda lectura consecutiva a la base de datos de Hive.
+    await syncInventoryAlertsUseCase(items);
   }
 
   Future<void> _onAddItem(
     AddInventoryItemEvent event,
     Emitter<InventoryState> emit,
   ) async {
-    // La cuota se resuelve a través de la política de dominio, no consultando
-    // directamente el estado de suscripción de la feature de monetización.
-    final itemsResult = await getInventoryItemsUseCase();
-    final currentItems = itemsResult.getOrElse((_) => const <FrozenItem>[]);
-    final activeCount = _countActive(currentItems);
+    // Si el estado ya está cargado, reutilizamos activeCount en memoria para
+    // evitar una lectura completa previa innecesaria.
+    final int activeCount;
+    if (state is InventoryLoaded) {
+      activeCount = (state as InventoryLoaded).activeCount;
+    } else {
+      final itemsResult = await getInventoryItemsUseCase();
+      final currentItems = itemsResult.getOrElse((_) => const <FrozenItem>[]);
+      activeCount = _countActive(currentItems);
+    }
 
     final canAddItem = await _evaluateCanAddItem(activeCount: activeCount);
 
@@ -321,6 +325,9 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     UrgencyStatus? urgencyFilter,
     FoodCategory? categoryFilter,
   ) {
+    if (urgencyFilter == null && categoryFilter == null) {
+      return items;
+    }
     return items.where((item) {
       if (urgencyFilter != null && item.urgencyStatus != urgencyFilter) {
         return false;

@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:hive/hive.dart';
 
+import '../di/injection_container.dart';
+import '../../features/monetization/data/datasources/in_app_purchase_datasource.dart';
 import '../utils/logger.dart';
 import 'ad_service.dart';
 
@@ -94,6 +97,25 @@ class AdMobAdService implements IAdService {
     return defaultTargetPlatform == TargetPlatform.iOS ? _iosDemoRewarded : _androidDemoRewarded;
   }
 
+  /// Consulta si el usuario es Pro de forma segura y sin bloquear la UI.
+  bool _checkIsProSafe() {
+    try {
+      if (sl.isRegistered<Box<dynamic>>(instanceName: 'monetization_box')) {
+        final box = sl<Box<dynamic>>(instanceName: 'monetization_box');
+        return box.get(IInAppPurchaseDataSource.proUserKey, defaultValue: false) == true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  /// Espera a que concluya la inicialización asíncrona del SDK de AdMob si está en curso.
+  Future<void> waitForInitialization() {
+    if (_isInitialized) return Future.value();
+    final inFlight = _initCompleter;
+    if (inFlight != null) return inFlight.future;
+    return initialize();
+  }
+
   @override
   Future<void> initialize() async {
     if (_isInitialized) {
@@ -115,9 +137,14 @@ class AdMobAdService implements IAdService {
       _isInitialized = true;
       AppLogger.info('Google Mobile Ads inicializado exitosamente.', tag: _tag);
 
-      // Precargar anuncios en segundo plano tras inicialización
-      _loadInterstitial();
-      _loadRewarded();
+      // Precargar anuncios en segundo plano tras inicialización solo si el usuario no es Pro
+      final isPro = _checkIsProSafe();
+      if (!isPro) {
+        _loadInterstitial();
+        _loadRewarded();
+      } else {
+        AppLogger.info('Usuario Pro detectado; se omite la precarga de anuncios para ahorrar memoria y red.', tag: _tag);
+      }
 
       if (!completer.isCompleted) completer.complete();
     } catch (e, stackTrace) {
@@ -156,6 +183,7 @@ class AdMobAdService implements IAdService {
   // ===========================================================================
 
   void _loadInterstitial() {
+    if (_checkIsProSafe()) return;
     if (_isInterstitialLoading || _interstitialAd != null) return;
     _isInterstitialLoading = true;
 
@@ -196,6 +224,11 @@ class AdMobAdService implements IAdService {
 
   @override
   Future<void> showInterstitial({required String placementName}) async {
+    if (_checkIsProSafe()) {
+      AppLogger.debug('Usuario Pro: omitiendo intersticial para $placementName', tag: _tag);
+      return;
+    }
+
     if (!_isInitialized) {
       AppLogger.warning('Intento de mostrar intersticial antes de inicializar SDK.', tag: _tag);
       return;
@@ -215,6 +248,7 @@ class AdMobAdService implements IAdService {
   // ===========================================================================
 
   void _loadRewarded() {
+    if (_checkIsProSafe()) return;
     if (_isRewardedLoading || _rewardedAd != null) return;
     _isRewardedLoading = true;
 
@@ -311,6 +345,8 @@ class AdMobAdService implements IAdService {
     } finally {
       _interstitialAd = null;
       _rewardedAd = null;
+      _isInterstitialLoading = false;
+      _isRewardedLoading = false;
       _isInitialized = false;
       _initCompleter = null;
     }
@@ -340,6 +376,25 @@ class _AdMobBannerWidgetState extends State<AdMobBannerWidget> {
   @override
   void initState() {
     super.initState();
+    _loadBannerSafely();
+  }
+
+  Future<void> _loadBannerSafely() async {
+    // Si la inicialización del SDK de AdMob aún está en curso en segundo plano,
+    // esperamos asíncronamente antes de solicitar el banner.
+    if (sl.isRegistered<IAdService>()) {
+      final service = sl<IAdService>();
+      if (service is AdMobAdService && !service.isInitialized) {
+        try {
+          await service.waitForInitialization();
+        } catch (e) {
+          AppLogger.warning('Fallo esperando inicialización de AdMob para el banner: $e', tag: _bannerTag);
+          return;
+        }
+      }
+    }
+
+    if (!mounted) return;
     _loadBanner();
   }
 
@@ -393,4 +448,3 @@ class _AdMobBannerWidgetState extends State<AdMobBannerWidget> {
     );
   }
 }
-

@@ -11,6 +11,8 @@ import 'package:subzero/features/monetization/domain/entities/subscription_statu
 class MockInAppPurchaseDataSource extends Mock
     implements IInAppPurchaseDataSource {}
 
+class MockProductDetails extends Mock implements ProductDetails {}
+
 void main() {
   late MockInAppPurchaseDataSource mockDataSource;
   late MonetizationRepositoryImpl repository;
@@ -32,10 +34,6 @@ void main() {
     test(
         'devuelve isPro=true cuando la tienda confirma la ownership (no lee el flag antes de tiempo)',
         () async {
-      // La versión anterior hacía:
-      //   await dataSource.restorePurchases();
-      //   final isPro = await dataSource.getIsProLocal();  <-- leía antes de tiempo
-      // y devolvía false, dejando al usuario bloqueado.
       when(() => mockDataSource.restorePurchasesAndWait(
             timeout: any(named: 'timeout'),
           )).thenAnswer((_) async => true);
@@ -77,6 +75,23 @@ void main() {
         (failure) => fail('Se esperaba Right, se obtuvo $failure'),
         (status) => expect(status.isPro, isFalse),
       );
+    });
+  });
+
+  group('getProductDetails caching', () {
+    test('cachea ProductDetails en memoria tras la primera consulta exitosa', () async {
+      final mockProduct = MockProductDetails();
+      when(() => mockDataSource.getProductDetails())
+          .thenAnswer((_) async => mockProduct);
+
+      final firstCall = await repository.getProductDetails();
+      final secondCall = await repository.getProductDetails();
+
+      expect(firstCall.getOrElse((_) => null), equals(mockProduct));
+      expect(secondCall.getOrElse((_) => null), equals(mockProduct));
+
+      // Solo una llamada a la pasarela externa gracias a la caché
+      verify(() => mockDataSource.getProductDetails()).called(1);
     });
   });
 }

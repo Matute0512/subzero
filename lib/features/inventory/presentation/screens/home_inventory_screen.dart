@@ -170,6 +170,9 @@ class _HomeInventoryScreenState extends State<HomeInventoryScreen> {
           listenWhen: (previous, current) => previous.isPro != current.isPro,
           listener: (context, state) {
             context.read<InventoryBloc>().add(const RefreshInventoryQuotaEvent());
+            if (state.isPro) {
+              _adService.dispose();
+            }
           },
         ),
         BlocListener<InventoryBloc, InventoryState>(

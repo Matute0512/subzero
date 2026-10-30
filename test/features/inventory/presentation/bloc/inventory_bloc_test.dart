@@ -61,6 +61,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(sampleItem);
+    registerFallbackValue(<FrozenItem>[]);
   });
 
   setUp(() {
@@ -81,6 +82,7 @@ void main() {
         .thenAnswer((_) async {});
 
     when(() => mockSyncAlerts()).thenAnswer((_) async => const Right(0));
+    when(() => mockSyncAlerts(any())).thenAnswer((_) async => const Right(0));
 
     when(() => mockQuotaPolicy.canAddItem(
           currentActiveCount: any(named: 'currentActiveCount'),

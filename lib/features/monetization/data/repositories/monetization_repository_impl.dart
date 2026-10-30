@@ -18,6 +18,7 @@ class MonetizationRepositoryImpl implements IMonetizationRepository {
   final StreamController<PurchaseIssue> _issueController =
       StreamController<PurchaseIssue>.broadcast();
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
+  ProductDetails? _cachedProductDetails;
 
   MonetizationRepositoryImpl({required this.dataSource}) {
     _purchaseSub = dataSource.purchaseStream.listen((purchases) async {
@@ -68,8 +69,14 @@ class MonetizationRepositoryImpl implements IMonetizationRepository {
 
   @override
   Future<Either<Failure, ProductDetails?>> getProductDetails() async {
+    if (_cachedProductDetails != null) {
+      return Right(_cachedProductDetails);
+    }
     try {
       final product = await dataSource.getProductDetails();
+      if (product != null) {
+        _cachedProductDetails = product;
+      }
       return Right(product);
     } on PaymentException catch (e) {
       return Left(PaymentFailure(message: e.message));
@@ -122,6 +129,7 @@ class MonetizationRepositoryImpl implements IMonetizationRepository {
 
   @override
   void dispose() {
+    _cachedProductDetails = null;
     _purchaseSub?.cancel();
     _statusController.close();
     _issueController.close();

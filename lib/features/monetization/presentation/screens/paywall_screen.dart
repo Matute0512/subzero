@@ -12,6 +12,10 @@ class PaywallScreen extends StatelessWidget {
   const PaywallScreen({super.key});
 
   static Future<void> show(BuildContext context) {
+    final bloc = context.read<MonetizationBloc>();
+    if (bloc.state.productDetails == null && !bloc.state.isLoading) {
+      bloc.add(const LoadProductsEvent());
+    }
     return Navigator.of(context).push<void>(
       MaterialPageRoute(
         fullscreenDialog: true,
@@ -22,6 +26,19 @@ class PaywallScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Si la pantalla se abre directamente sin pasar por show(), carga bajo demanda.
+    final bloc = context.read<MonetizationBloc>();
+    if (bloc.state.productDetails == null && !bloc.state.isLoading && !bloc.state.isPro) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          final current = context.read<MonetizationBloc>().state;
+          if (current.productDetails == null && !current.isLoading) {
+            context.read<MonetizationBloc>().add(const LoadProductsEvent());
+          }
+        }
+      });
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundDark,
       body: SafeArea(
@@ -51,7 +68,7 @@ class PaywallScreen extends StatelessWidget {
                 children: [
                   // Botón Cerrar
                   Align(
-                    alignment: Alignment.centerLeft,
+                     alignment: Alignment.centerLeft,
                     child: Container(
                       decoration: const BoxDecoration(
                         color: AppTheme.surface,

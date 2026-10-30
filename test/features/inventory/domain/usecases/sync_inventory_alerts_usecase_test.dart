@@ -53,9 +53,9 @@ void main() {
     mockGetItems = MockGetInventoryItemsUseCase();
     mockNotificationService = MockNotificationService();
 
-    when(() => mockNotificationService.scheduleItemAlerts(any()))
-        .thenAnswer((_) async {});
     when(() => mockNotificationService.cancelAllAlerts())
+        .thenAnswer((_) async {});
+    when(() => mockNotificationService.scheduleItemAlerts(any()))
         .thenAnswer((_) async {});
 
     useCase = SyncInventoryAlertsUseCase(
@@ -79,6 +79,19 @@ void main() {
 
       verify(() => mockNotificationService.scheduleItemAlerts(a)).called(1);
       verify(() => mockNotificationService.scheduleItemAlerts(b)).called(1);
+    });
+
+    test('reutiliza preloadedItems sin llamar a getInventoryItemsUseCase', () async {
+      final a = item(id: 'a');
+      final result = await useCase([a]);
+
+      result.fold(
+        (failure) => fail('Se esperaba Right, se obtuvo $failure'),
+        (scheduled) => expect(scheduled, 1),
+      );
+
+      verifyNever(() => mockGetItems());
+      verify(() => mockNotificationService.scheduleItemAlerts(a)).called(1);
     });
 
     test('no reprograma alertas para alimentos consumidos ni desactivados',
